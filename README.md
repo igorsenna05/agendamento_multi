@@ -1,5 +1,3 @@
-### README.md
-
 # Sistema de Menu de Serviços Online - Coren-RJ
 
 Este projeto é um sistema de árvore de decisões interativa e módulo de agendamento de serviços, com um painel administrativo para gerenciar ambos. Foi desenvolvido utilizando Laravel 11, proporcionando uma interface intuitiva tanto para usuários finais quanto para administradores.
@@ -132,7 +130,7 @@ php artisan serve
 
 Acesse a aplicação em [http://localhost:8000](http://localhost:8000).
 
-### Gerenciamento de Árvore de Decisões
+### Gerenciamento de Menus
 
 - Navegue até `/decision_tree` para visualizar e gerenciar a árvore de decisões.
 - Utilize os botões "Adicionar Nó" para criar novos nós e "Editar" para modificar nós existentes.
