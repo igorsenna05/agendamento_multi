@@ -17,19 +17,21 @@ class ScheduleSlotController extends Controller
     public function index(Request $request)
     {
         $locations = Location::all();
-        $query = ScheduleSlot::with('location');
-
+        $startDate = $request->get('start_date') ? Carbon::parse($request->get('start_date')) : Carbon::now()->startOfWeek();
+        $endDate = $startDate->copy()->endOfWeek();
+    
+        $query = ScheduleSlot::with('location')
+            ->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+    
         if ($request->has('location_id')) {
             $query->where('location_id', $request->input('location_id'));
         }
-
-        if ($request->has('date')) {
-            $query->whereDate('date', $request->input('date'));
-        }
-
-        $scheduleSlots = $query->paginate(10);
-
-        return view('schedule_slots.index', compact('scheduleSlots', 'locations'));
+    
+        $scheduleSlots = $query->get()->groupBy(function ($date) {
+            return Carbon::parse($date->date)->format('Y-m-d');
+        });
+    
+        return view('schedule_slots.index', compact('scheduleSlots', 'locations', 'startDate', 'endDate'));
     }
     /**
      * Show the form for creating a new resource.

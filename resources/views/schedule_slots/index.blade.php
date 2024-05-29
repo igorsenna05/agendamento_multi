@@ -24,38 +24,51 @@
                             <button type="submit" class="btn btn-primary">{{ __('Filtrar') }}</button>
                         </div>
                     </form>
-                    <table class="table-auto w-full mt-4">
+                    <div class="flex justify-between mb-4">
+                        <a href="{{ route('schedule_slots.index', ['start_date' => $startDate->copy()->subWeek()->toDateString()]) }}" class="btn btn-primary">Semana Anterior</a>
+                        <h3>Semana de {{ $startDate->format('d/m/Y') }} a {{ $endDate->format('d/m/Y') }}</h3>
+                        <a href="{{ route('schedule_slots.index', ['start_date' => $startDate->copy()->addWeek()->toDateString()]) }}" class="btn btn-primary">Próxima Semana</a>
+                    </div>
+                    <table class="table-auto w-full">
                         <thead>
                             <tr>
-                                <th class="px-4 py-2">{{ __('ID') }}</th>
-                                <th class="px-4 py-2">{{ __('Data') }}</th>
-                                <th class="px-4 py-2">{{ __('Hora') }}</th>
-                                <th class="px-4 py-2">{{ __('Disponível') }}</th>
-                                <th class="px-4 py-2">{{ __('Localização') }}</th>
-                                <th class="px-4 py-2">{{ __('Ações') }}</th>
+                                @for ($i = 0; $i < 7; $i++)
+                                    <th class="px-4 py-2">{{ $startDate->copy()->addDays($i)->format('d/m/Y') }}</th>
+                                @endfor
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($scheduleSlots as $slot)
+                            @foreach (range(8, 18) as $hour)
                                 <tr>
-                                    <td class="border px-4 py-2">{{ $slot->id }}</td>
-                                    <td class="border px-4 py-2">{{ \Carbon\Carbon::parse($slot->date)->format('d/m/Y') }}</td>
-                                    <td class="border px-4 py-2">{{ $slot->time }}</td>
-                                    <td class="border px-4 py-2">{{ $slot->is_available ? 'Sim' : 'Não' }}</td>
-                                    <td class="border px-4 py-2">{{ $slot->location->name }}</td>
-                                    <td class="border px-4 py-2">
-                                        <a href="{{ route('schedule_slots.edit', $slot->id) }}" class="btn btn-warning">{{ __('Editar') }}</a>
-                                        <form action="{{ route('schedule_slots.destroy', $slot->id) }}" method="POST" style="display:inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">{{ __('Excluir') }}</button>
-                                        </form>
-                                    </td>
+                                    @for ($i = 0; $i < 7; $i++)
+                                        @php
+                                            $date = $startDate->copy()->addDays($i)->format('Y-m-d');
+                                            $hourFormatted = sprintf('%02d:00:00', $hour);
+                                            $slots = $scheduleSlots->get($date) ? $scheduleSlots->get($date)->where('time', $hourFormatted) : collect();
+                                            $availableSlots = $slots->where('is_available', true)->count();
+                                            $totalSlots = $slots->count();
+                                        @endphp
+                                        <td class="border px-4 py-2">
+                                            <div>{{ $hourFormatted }}</div>
+                                            <div>Disponíveis: {{ $availableSlots }}</div>
+                                            <div>Total: {{ $totalSlots }}</div>
+                                            @foreach ($slots as $slot)
+                                                <div>
+                                                    {{ $slot->location->name }} 
+                                                    <a href="{{ route('schedule_slots.edit', $slot->id) }}" class="btn btn-warning btn-sm">{{ __('Editar') }}</a>
+                                                    <form action="{{ route('schedule_slots.destroy', $slot->id) }}" method="POST" style="display:inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm">{{ __('Excluir') }}</button>
+                                                    </form>
+                                                </div>
+                                            @endforeach
+                                        </td>
+                                    @endfor
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    {{ $scheduleSlots->links() }}
                 </div>
             </div>
         </div>
