@@ -91,4 +91,29 @@ class DecisionTreeController extends Controller
         $decisionTree->delete();
         return redirect()->route('decision_tree.index')->with('success', 'Nó excluído com sucesso.');
     }
+
+    public function handleMenuClick($id)
+    {
+        $node = DecisionTree::with('instruction')->findOrFail($id);
+    
+        if ($node->instruction) {
+            // Se houver instrução, redireciona para a página de instruções
+            return view('decision_tree.instruction', compact('node'));
+        } else {
+            // Se não houver instrução, redireciona para a ação predeterminada
+            return $this->performAction($node);
+        }
+    }
+    
+    private function performAction($node)
+    {
+        // Lógica para redirecionar para o caminho predeterminado
+        if ($node->action_type === 'external_link') {
+            return redirect($node->action_target);
+        } elseif ($node->action_type === 'schedule') {
+            return redirect()->route('scheduling.index');
+        }
+    
+        // Adicione outras ações conforme necessário
+    }  
 }

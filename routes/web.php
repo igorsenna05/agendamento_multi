@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Route;
 
 // Show Decision Tree at the root.
 Route::get('/', [DecisionTreeController::class, 'user'])->name('decision_tree.user');
+Route::get('/decision_tree/handle/{id}', [DecisionTreeController::class, 'handleMenuClick'])->name('decision_tree.handleMenuClick');
+Route::get('/decision_tree/perform/{id}', [DecisionTreeController::class, 'performAction'])->name('decision_tree.performAction');
+
 
 // Scheduling
 Route::get('/scheduling', [SchedulingController::class, 'index'])->name('scheduling.index');
@@ -38,7 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('schedule_slots/bulk_destroy', [ScheduleSlotController::class, 'bulkDestroy'])->name('schedule_slots.bulkDestroy');
     Route::resource('schedule_slots', ScheduleSlotController::class); 
     //instructions
-    Route::resource('instructions', InstructionController::Class); 
+    Route::resource('instructions', InstructionController::class); 
 
 });
 
