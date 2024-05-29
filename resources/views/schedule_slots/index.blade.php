@@ -39,7 +39,7 @@
                             @foreach ($scheduleSlots as $slot)
                                 <tr>
                                     <td class="border px-4 py-2">{{ $slot->id }}</td>
-                                    <td class="border px-4 py-2">{{ $slot->date }}</td>
+                                    <td class="border px-4 py-2">{{ \Carbon\Carbon::parse($slot->date)->format('d/m/Y') }}</td>
                                     <td class="border px-4 py-2">{{ $slot->time }}</td>
                                     <td class="border px-4 py-2">{{ $slot->is_available ? 'Sim' : 'Não' }}</td>
                                     <td class="border px-4 py-2">{{ $slot->location->name }}</td>

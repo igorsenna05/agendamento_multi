@@ -43,11 +43,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Available Date for Scheduling -->
-                                <div class="mb-3">
-                                    <label for="available_date" class="form-label">{{ __('Data Disponível para Marcação') }}</label>
-                                    <input type="text" id="available_date" name="available_date" class="form-control flatpickr-available-date" placeholder="Selecione a data" value="{{ old('available_date') }}" required>
-                                </div>
+
 
                                 <!-- Location Selection -->
                                 <div class="mb-3">
@@ -69,7 +65,17 @@
                                     <label for="appointments_per_slot" class="form-label">{{ __('Número de Atendimentos por Período') }}</label>
                                     <input type="number" id="appointments_per_slot" name="appointments_per_slot" class="form-control"  value="{{ old('appointments_per_slot') }}" required>
                                 </div>
-
+                                <!-- Available Date for Scheduling -->
+                                <div class="mb-3">
+                                    <label for="available_date" class="form-label">{{ __('Data Disponível para Marcação') }}</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><li class="list-inline-item"><i class="fas fa-calendar-alt text-primary"></i></span>
+                                        </div>
+                                        <input type="text" id="available_date" name="available_date" class="form-control flatpickr-available-date" placeholder="Selecione a data" value="{{ \Carbon\Carbon::now()->isMonday() ? \Carbon\Carbon::now()->format('d/m/Y') : \Carbon\Carbon::now()->next(\Carbon\Carbon::MONDAY)->format('d/m/Y') }} 18:00" required>
+                                        
+                                    </div>
+                                </div>
                                 <!-- Submit Button -->
                                 <div class="d-flex justify-content-between">
                                     <button type="submit" class="btn btn-success">
@@ -118,8 +124,10 @@
 
             // Initialize Flatpickr for available date
             flatpickr('.flatpickr-available-date', {
-                dateFormat: 'd-m-Y',
+                dateFormat: 'd/m/Y H:i',
                 locale: 'pt',
+                enableTime: true,
+                allowInput: true,
                 inline: false,
                 onChange: function(selectedDates, dateStr, instance) {
                     document.getElementById('available_date').value = dateStr;
