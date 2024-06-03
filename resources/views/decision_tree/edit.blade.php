@@ -21,10 +21,9 @@
                             <select id="parent_id" name="parent_id" class="form-select">
                                 <option value="">{{ __('Nenhum') }}</option>
                                 @foreach ($parentNodes as $node)
-                                    <option value="{{ $node->id }}" {{ $node->id == $decisionTree->parent_id ? 'selected' : '' }}>{{ $node->label }}</option>
+                                    @include('decision_tree.partials.menu_option', ['node' => $node, 'level' => 0, 'selected' => $decisionTree->parent_id])
                                 @endforeach
                             </select>
-                        </div>
                         <div class="mb-3">
                             <label for="action_type" class="form-label">{{ __('Tipo da Ação') }}</label>
                             <select id="action_type" name="action_type" class="form-select">

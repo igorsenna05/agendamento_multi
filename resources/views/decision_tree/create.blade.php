@@ -20,7 +20,7 @@
                             <select id="parent_id" name="parent_id" class="form-select">
                                 <option value="">{{ __('Nenhum') }}</option>
                                 @foreach ($parentNodes as $node)
-                                    <option value="{{ $node->id }}">{{ $node->label }}</option>
+                                    @include('decision_tree.partials.menu_option', ['node' => $node, 'level' => 0])
                                 @endforeach
                             </select>
                         </div>
@@ -33,11 +33,11 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="instruction_id" class="form-label">{{ __('Instrução') }}</label>
-                            <select id="instruction_id" name="instruction_id" class="form-select">
-                                <option value="">{{ __('Nenhum') }}</option>
+                            <label for="instructions" class="form-label">{{ __('Instruções') }}</label>
+                            <select id="instructions" name="instructions" class="form-select">
+                                <option value="">{{ __('Selecione uma Instrução') }}</option>
                                 @foreach ($instructions as $instruction)
-                                    <option value="{{ $instruction->id }}">{{ $instruction->title }}</option>
+                                    <option value="{{ $instruction->id }}">{{ $instruction->name }}</option>
                                 @endforeach
                             </select>
                         </div>

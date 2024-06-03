@@ -23,14 +23,19 @@ class DecisionTree extends Model
     {
         return $this->belongsTo(DecisionTree::class, 'parent_id');
     }
-  
+
     public function children()
     {
         return $this->hasMany(DecisionTree::class, 'parent_id');
     }
- 
+
     public function instruction()
     {
         return $this->belongsTo(Instruction::class);
+    }
+
+    public function childrenRecursive()
+    {
+        return $this->children()->with('childrenRecursive');
     }
 }

@@ -32,7 +32,7 @@ class DecisionTreeController extends Controller
      */
     public function create()
     {
-        $parentNodes = DecisionTree::all();
+        $parentNodes = DecisionTree::whereNull('parent_id')->with('children')->get();
         $instructions = Instruction::all();
         return view('decision_tree.create', compact('parentNodes','instructions'));
     }
@@ -69,7 +69,7 @@ class DecisionTreeController extends Controller
     public function edit($id)
     {
         $decisionTree = DecisionTree::findOrFail($id);
-        $parentNodes = DecisionTree::whereNull('parent_id')->get();
+        $parentNodes = DecisionTree::whereNull('parent_id')->with('children')->get();
         $instructions = Instruction::all();
 
         return view('decision_tree.edit', compact('decisionTree', 'parentNodes', 'instructions'));
