@@ -13,6 +13,8 @@ class Schedule extends Model
         'user_name',
         'user_cpf',
         'user_insc',
+        'user_email',
+        'user_phone',
         'slot_id',
         'service_type',
         'location_id',

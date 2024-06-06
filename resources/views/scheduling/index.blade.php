@@ -11,12 +11,6 @@
         body {
             font-family: 'Nunito', sans-serif;
         }
-        .step-container {
-            display: none;
-        }
-        .step-container.active {
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -38,93 +32,82 @@
             @csrf
             <input type="hidden" name="service_type" value="{{ $node->action_value }}">
 
-            <!-- Step 1: User Information -->
-            <div id="step-1" class="step-container active">
-                <div class="form-group">
-                    <label for="user_name">Nome:</label>
+            <!-- User Information -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="user_name" class="form-label">Nome:</label>
                     <input type="text" class="form-control" name="user_name" id="user_name" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="user_cpf">CPF:</label>
+                <div class="col-md-6">
+                    <label for="user_cpf" class="form-label">CPF:</label>
                     <input type="text" class="form-control" name="user_cpf" id="user_cpf" required>
                 </div>
-
-                <div class="form-group">
-                    <label for="user_insc">Nº de Inscrição:</label>
-                    <input type="text" class="form-control" name="user_insc" id="user_insc" required>
-                </div>
-                <button type="button" class="btn btn-secondary"  id="back-to-menu">Voltar ao menu</button>
-                <button type="button" class="btn btn-primary" id="next-to-step-2">Próximo</button>
-                
             </div>
 
-            <!-- Step 2: Select Location and Date -->
-            <div id="step-2" class="step-container">
-                <div class="form-group">
-                    <label for="location_id">Local de Atendimento:</label>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="user_insc" class="form-label">Nº de Inscrição:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="user_insc" id="user_insc" required>
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categoria</button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#">Auxiliar de Enfermagem</a>
+                            <a class="dropdown-item" href="#">Técnico de Enfermagem</a>
+                            <a class="dropdown-item" href="#">Enfermeiro</a>
+                            <a class="dropdown-item" href="#">Obstetriz</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="user_email" class="form-label">E-mail de contato:</label>
+                    <input type="email" class="form-control" name="user_email" id="user_email" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="user_phone" class="form-label">Telefone:</label>
+                    <input type="text" class="form-control" name="user_phone" id="user_phone" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="location_id" class="form-label">Local de atendimento:</label>
                     <select class="form-control" name="location_id" id="location_id" required>
-                        <option value="">Selecione o Local</option>
+                        <option value="">Selecione o local</option>
                         @foreach($locations as $location)
                             <option value="{{ $location->id }}">{{ $location->name }}</option>
                         @endforeach
                     </select>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label for="slot_date">Dias Disponíveis:</label>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="slot_date" class="form-label">Dias disponíveis:</label>
                     <select class="form-control" name="slot_date" id="slot_date" required>
-                        <option value="">Selecione o Dia</option>
+                        <option value="">Selecione o dia</option>
                     </select>
                 </div>
 
-                <button type="button" class="btn btn-secondary" id="back-to-step-1">Voltar</button>
-                <button type="button" class="btn btn-primary" id="next-to-step-3">Próximo</button>
-            </div>
-
-            <!-- Step 3: Select Time Slot -->
-            <div id="step-3" class="step-container">
-                <div class="form-group">
-                    <label for="slot_id">Horários Disponíveis:</label>
+                <div class="col-md-6">
+                    <label for="slot_id" class="form-label">Horários disponíveis:</label>
                     <select class="form-control" name="slot_id" id="slot_id" required>
-                        <option value="">Selecione o Horário</option>
+                        <option value="">Selecione o horário</option>
                     </select>
                 </div>
-
-                <button type="button" class="btn btn-secondary" id="back-to-step-2">Voltar</button>
-                <button type="submit" class="btn btn-success">Agendar</button>
             </div>
+
+            <button type="submit" class="btn btn-success">Agendar</button>
         </form>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Navigation between steps
-            $('#next-to-step-2').click(function() {
-                $('#step-1').removeClass('active');
-                $('#step-2').addClass('active');
-            });
-
-            $('#back-to-step-1').click(function() {
-                $('#step-2').removeClass('active');
-                $('#step-1').addClass('active');
-            });
-
-            $('#next-to-step-3').click(function() {
-                $('#step-2').removeClass('active');
-                $('#step-3').addClass('active');
-            });
-
-            $('#back-to-step-2').click(function() {
-                $('#step-3').removeClass('active');
-                $('#step-2').addClass('active');
-            });
-            $('#back-to-menu').click(function() {
-                window.location.href = '/';
-            });
-
             // Load available dates when a location is selected
             $('#location_id').change(function() {
                 var location_id = $(this).val();
@@ -135,7 +118,7 @@
                         data: { location_id: location_id },
                         success: function(data) {
                             var dates = data.dates;
-                            $('#slot_date').empty().append('<option value="">Select Date</option>');
+                            $('#slot_date').empty().append('<option value="">Selecione o dia</option>');
                             dates.forEach(function(date) {
                                 $('#slot_date').append('<option value="' + date + '">' + date + '</option>');
                             });
@@ -154,10 +137,14 @@
                         type: 'GET',
                         data: { location_id: location_id, date: date },
                         success: function(data) {
-                            var slots = data.slots;
-                            $('#slot_id').empty().append('<option value="">Select Time Slot</option>');
-                            slots.forEach(function(slot) {
-                                $('#slot_id').append('<option value="' + slot.id + '">' + slot.time + '</option>');
+                            var uniqueSlots = {};
+                            $('#slot_id').empty().append('<option value="">Selecione o horário</option>');
+                            data.slots.forEach(function(slot) {
+                                var time = slot.time;
+                                if (!uniqueSlots[time]) {
+                                    uniqueSlots[time] = true;
+                                    $('#slot_id').append('<option value="' + slot.id + '">' + time + '</option>');
+                                }
                             });
                         }
                     });

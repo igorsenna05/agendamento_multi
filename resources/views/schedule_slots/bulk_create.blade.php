@@ -55,16 +55,28 @@
                                     </select>
                                 </div>
 
-                                <!-- Appointment Duration -->
+                                <!-- Appointment Duration and -->
+                            <div class="d-flex gap-3">
+                                <div>
+                                    <label for="start_time" class="form-label">Hora de Início</label>
+                                    <input type="time" name="start_time" id="start_time" class="form-control" value="{{ old('start_time') }}" required="">
+                                </div>
+                                <div>
+                                    <label for="end_time" class="form-label">Hora de Término</label>
+                                    <input type="time" name="end_time" id="end_time" class="form-control" value="{{ old('end_time') }}" required="">
+                                </div>
                                 <div class="mb-3">
                                     <label for="appointment_duration" class="form-label">{{ __('Duração de Cada Atendimento (minutos)') }}</label>
                                     <input type="number" id="appointment_duration" name="appointment_duration" class="form-control"  value="{{ old('appointment_duration') }}" required>
                                 </div>
-
                                 <div class="mb-3">
                                     <label for="appointments_per_slot" class="form-label">{{ __('Número de Atendimentos por Período') }}</label>
                                     <input type="number" id="appointments_per_slot" name="appointments_per_slot" class="form-control"  value="{{ old('appointments_per_slot') }}" required>
                                 </div>
+                            </div>
+
+
+
                                 <!-- Available Date for Scheduling -->
                                 <div class="mb-3">
                                     <label for="available_date" class="form-label">{{ __('Data Disponível para Marcação') }}</label>

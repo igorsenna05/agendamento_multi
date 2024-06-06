@@ -6,8 +6,10 @@ use App\Models\ScheduleSlot;
 use App\Models\Location;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+
 
 class ScheduleSlotController extends Controller
 {
@@ -31,7 +33,12 @@ class ScheduleSlotController extends Controller
             return Carbon::parse($date->date)->format('Y-m-d');
         });
     
-        return view('schedule_slots.index', compact('scheduleSlots', 'locations', 'startDate', 'endDate'));
+        // Obter todos os agendamentos dentro do intervalo de datas através do relacionamento com ScheduleSlot
+        $agendamentos = Schedule::whereHas('slot', function (Builder $query) use ($startDate, $endDate) {
+            $query->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+        })->get();
+    
+        return view('schedule_slots.index', compact('scheduleSlots', 'locations', 'startDate', 'endDate', 'agendamentos'));
     }
     /**
      * Show the form for creating a new resource.
@@ -75,6 +82,7 @@ class ScheduleSlotController extends Controller
             'end_time' => 'required|date_format:H:i',
             'appointment_duration' => 'required|integer',
             'appointments_per_slot' => 'required|integer',
+            'available_date' => 'required|date_format:d/m/Y H:i',
         ]);
 
         $dates = collect();
@@ -99,6 +107,7 @@ class ScheduleSlotController extends Controller
         $appointment_duration = intval($request->input('appointment_duration'));
         $appointments_per_slot = $request->input('appointments_per_slot');
         $location_ids = $request->input('locations');
+        $available_date = $request->input('available_date');
 
         foreach ($dates as $date) {
             foreach ($location_ids as $location_id) {
@@ -110,6 +119,7 @@ class ScheduleSlotController extends Controller
                             'time' => $current_time->toTimeString(),
                             'is_available' => true,
                             'location_id' => $location_id,
+                            'available_date' => Carbon::createFromFormat('d/m/Y H:i', $available_date)->toDateTimeString(),
                         ]);
                     }
                     $current_time->addMinutes($appointment_duration);
