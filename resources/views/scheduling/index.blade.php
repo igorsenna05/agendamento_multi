@@ -11,13 +11,22 @@
         body {
             font-family: 'Nunito', sans-serif;
         }
+        .container {
+            max-width: 800px;
+        }
+        .dropdown-menu a {
+            cursor: pointer;
+        }
+        .input-group .input-group-text {
+            cursor: default;
+        }
     </style>
 </head>
 <body>
     <div class="container mt-5">
-        <div class="shrink-0 flex items-center">
+        <div class="text-center mb-4">
             <a href="https://coren-rj.org.br" target="_blank">
-                <center><x-application-logo class="block w-auto fill-current text-gray-800" /></center>
+                <x-application-logo class="block w-auto fill-current text-gray-800" />
             </a>
         </div>
         <h1 class="mb-4 text-center">Agendamento {{ $node->label }}</h1>
@@ -28,74 +37,93 @@
             </div>
         @endif
 
-        <form id="scheduling-form" action="{{ route('scheduling.store') }}" method="POST">
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form id="scheduling-form" action="{{ route('scheduling.store') }}" method="POST" onsubmit="return validateForm()">
             @csrf
             <input type="hidden" name="service_type" value="{{ $node->action_value }}">
+            <input type="hidden" name="formatted_insc" id="formatted_insc" value="{{ old('formatted_insc') }}">
 
             <!-- User Information -->
-            <div class="row mb-3">
-                <div class="col-md-6">
+            <div class="mb-4">
+                <h4>Dados Pessoais</h4>
+                <div class="mb-3">
                     <label for="user_name" class="form-label">Nome:</label>
-                    <input type="text" class="form-control" name="user_name" id="user_name" required>
+                    <input type="text" class="form-control" name="user_name" id="user_name" value="{{ old('user_name') }}" required>
                 </div>
 
-                <div class="col-md-6">
-                    <label for="user_cpf" class="form-label">CPF:</label>
-                    <input type="text" class="form-control" name="user_cpf" id="user_cpf" required>
-                </div>
-            </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="user_cpf" class="form-label">CPF:</label>
+                        <input type="text" class="form-control" name="user_cpf" id="user_cpf" value="{{ old('user_cpf') }}" required>
+                    </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="user_insc" class="form-label">Nº de Inscrição:</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="user_insc" id="user_insc" required>
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categoria</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Auxiliar de Enfermagem</a>
-                            <a class="dropdown-item" href="#">Técnico de Enfermagem</a>
-                            <a class="dropdown-item" href="#">Enfermeiro</a>
-                            <a class="dropdown-item" href="#">Obstetriz</a>
+                    <div class="col-md-6">
+                        <label for="user_insc" class="form-label">Nº de Inscrição:</label>
+                        <div class="input-group">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" required>Categoria</button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" data-category="AE">Auxiliar de Enfermagem</a>
+                                <a class="dropdown-item" data-category="TE">Técnico de Enfermagem</a>
+                                <a class="dropdown-item" data-category="ENF">Enfermeiro</a>
+                                <a class="dropdown-item" data-category="OB">Obstetriz</a>
+                            </div>
+                            <input type="number" class="form-control" name="user_insc" id="user_insc" value="{{ old('user_insc') }}" required style="text-align: right;">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="insc_suffix">{{ old('formatted_insc') ? explode('-', old('formatted_insc'))[1] : '' }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6">
-                    <label for="user_email" class="form-label">E-mail de contato:</label>
-                    <input type="email" class="form-control" name="user_email" id="user_email" required>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="user_phone" class="form-label">Telefone:</label>
+                        <input type="text" class="form-control" name="user_phone" id="user_phone" value="{{ old('user_phone') }}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="user_email" class="form-label">E-mail de contato:</label>
+                        <input type="email" class="form-control" name="user_email" id="user_email" value="{{ old('user_email') }}" required>
+                    </div>
                 </div>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="user_phone" class="form-label">Telefone:</label>
-                    <input type="text" class="form-control" name="user_phone" id="user_phone" required>
-                </div>
-
-                <div class="col-md-6">
+            <!-- Scheduling Information -->
+            <div class="mb-4">
+                <h4>Dados do Agendamento</h4>
+                <div class="mb-3">
                     <label for="location_id" class="form-label">Local de atendimento:</label>
                     <select class="form-control" name="location_id" id="location_id" required>
                         <option value="">Selecione o local</option>
                         @foreach($locations as $location)
-                            <option value="{{ $location->id }}">{{ $location->name }}</option>
+                            <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
                         @endforeach
                     </select>
                 </div>
-            </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="slot_date" class="form-label">Dias disponíveis:</label>
-                    <select class="form-control" name="slot_date" id="slot_date" required>
-                        <option value="">Selecione o dia</option>
-                    </select>
-                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="slot_date" class="form-label">Dias disponíveis:</label>
+                        <select class="form-control" name="slot_date" id="slot_date" required>
+                            <option value="">Selecione o dia</option>
+                        </select>
+                    </div>
 
-                <div class="col-md-6">
-                    <label for="slot_id" class="form-label">Horários disponíveis:</label>
-                    <select class="form-control" name="slot_id" id="slot_id" required>
-                        <option value="">Selecione o horário</option>
-                    </select>
+                    <div class="col-md-6">
+                        <label for="slot_id" class="form-label">Horários disponíveis:</label>
+                        <select class="form-control" name="slot_id" id="slot_id" required>
+                            <option value="">Selecione o horário</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -150,6 +178,47 @@
                     });
                 }
             });
+
+            // Handle category selection and append to user_insc input
+            $('.dropdown-item').click(function() {
+                var category = $(this).data('category');
+                var currentInsc = $('#user_insc').val().split('-')[0];
+                $('#insc_suffix').text(category);
+                $('#user_insc').val(currentInsc).focus();
+                updateFormattedInsc();
+            });
+
+            // Update formatted_insc input on user_insc change
+            $('#user_insc').on('input', function() {
+                updateFormattedInsc();
+            });
+
+            function updateFormattedInsc() {
+                var inscNumber = $('#user_insc').val();
+                var category = $('#insc_suffix').text();
+                $('#formatted_insc').val(inscNumber + '-' + category);
+            }
+
+            // Validate form to ensure category is selected
+            window.validateForm = function() {
+                var category = $('#insc_suffix').text();
+                if (!category) {
+                    alert('Por favor, selecione uma categoria para o Nº de Inscrição.');
+                    return false;
+                }
+                return true;
+            };
+
+            // Restore old values for dynamically loaded options
+            if ('{{ old("location_id") }}') {
+                $('#location_id').trigger('change');
+                setTimeout(function() {
+                    $('#slot_date').val('{{ old("slot_date") }}').trigger('change');
+                    setTimeout(function() {
+                        $('#slot_id').val('{{ old("slot_id") }}');
+                    }, 500);
+                }, 500);
+            }
         });
     </script>
 </body>

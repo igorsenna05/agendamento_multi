@@ -58,7 +58,7 @@
     <div class="container  d-flex flex-column align-items-center">
         <div id="title" class="menu-title">
             <div class="shrink-0 flex items-center justify-center mt-4">
-                <img src="https://www.coren-rj.org.br/site/wp-content/uploads/2018/11/logo-horizontal.png" alt="logo" class="block h-12" />
+            <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
             </div>
         </div>
         <div id="subtitle" class="menu-subtitle"></div>
