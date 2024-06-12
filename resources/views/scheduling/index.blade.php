@@ -148,7 +148,7 @@
                             var dates = data.dates;
                             $('#slot_date').empty().append('<option value="">Selecione o dia</option>');
                             dates.forEach(function(date) {
-                                $('#slot_date').append('<option value="' + date + '">' + date + '</option>');
+                                $('#slot_date').append('<option value="' + date.original + '">' + date.formatted + '</option>');
                             });
                         }
                     });

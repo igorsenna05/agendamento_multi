@@ -9,6 +9,7 @@ use App\Models\ScheduleSlot;
 use App\Models\Schedule;
 use App\Models\DecisionTree;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class SchedulingController extends Controller
 {
@@ -30,27 +31,39 @@ class SchedulingController extends Controller
                 return redirect()->route('decision_tree.user')->with('error', 'Invalid node ID.');
             }
         }
-
+    
         if ($request->ajax()) {
             if ($request->has('location_id') && $request->has('date')) {
                 $slots = ScheduleSlot::where('location_id', $request->location_id)
                     ->whereDate('date', $request->date)
                     ->where('is_available', true)
-                    ->get();
+                    ->get()
+                    ->map(function($slot) {
+                        $slot->formatted_date = \Carbon\Carbon::parse($slot->date)->format('d/m/Y');
+                        $slot->time = \Carbon\Carbon::parse($slot->time)->format('H:i');
+                        return $slot;
+                    });
                 return response()->json(['slots' => $slots]);
             } elseif ($request->has('location_id')) {
                 $dates = ScheduleSlot::where('location_id', $request->location_id)
                     ->where('is_available', true)
+                    ->where('date','>=', Carbon::today())
                     ->select('date')
                     ->distinct()
                     ->get()
-                    ->pluck('date');
+                    ->map(function($date) {
+                        return [
+                            'original' => $date->date,
+                            'formatted' => \Carbon\Carbon::parse($date->date)->format('d/m/Y')
+                        ];
+                    });
                 return response()->json(['dates' => $dates]);
             }
         }
-
+    
         return view('scheduling.index', compact('services', 'locations', 'slots', 'node'));
     }
+    
 
     public function store(Request $request)
     {

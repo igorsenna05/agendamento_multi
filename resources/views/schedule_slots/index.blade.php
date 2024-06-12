@@ -73,7 +73,7 @@
                                                     </div>
                                                 @endforeach
                                             @else
-                                                <div>{{ __('Sem horários') }}</div>
+                                                <div>Sem <br/> horários </div>
                                             @endif
                                         </td>
                                     @endfor
