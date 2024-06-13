@@ -5,7 +5,6 @@
         </h2>
     </x-slot>
     
-    
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -17,26 +16,34 @@
                         <thead>
                             <tr>
                                 <th class="px-4 py-2">{{ __('Nome') }}</th>
+                                <th class="px-4 py-2">{{ __('Código do Serviço') }}</th>
                                 <th class="px-4 py-2">{{ __('Ações') }}</th>
                             </tr>
                         </thead>
                         <tbody id="services-table-body">
                             @foreach ($services as $service)
                                 <tr id="service-row-{{ $service->id }}">
-                                    <td class="border px-4 py-2" id="service-name-{{ $service->id }}">
-                                        {{ $service->name }}
+                                    <td class="border px-4 py-2 align-middle" id="service-name-{{ $service->id }}">
+                                        <span class="service-text">{{ $service->name }}</span>
+                                        <input type="text" class="service-input hidden" value="{{ $service->name }}">
+                                    </td>
+                                    <td class="border px-4 py-2 align-middle" id="service-code-{{ $service->id }}">
+                                        <span class="service-text">{{ $service->service_code }}</span>
+                                        <input type="text" class="service-input hidden" value="{{ $service->service_code }}">
                                     </td>
                                     <td class="border px-4 py-2 flex space-x-2">
-                                        <a href="javascript:void(0);" class="btn btn-warning" onclick="editService({{ $service->id }})" title="{{ __('Editar') }}">
+                                        <a href="javascript:void(0);" class="btn btn-warning" id="edit-button-{{ $service->id }}" onclick="editService({{ $service->id }})" title="{{ __('Editar') }}">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('services.destroy', $service->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirmDelete();" title="{{ __('Excluir') }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <a href="javascript:void(0);" class="btn btn-danger" id="delete-button-{{ $service->id }}" onclick="deleteService({{ $service->id }})" title="{{ __('Excluir') }}">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" class="btn btn-success hidden" id="confirm-edit-button-{{ $service->id }}" onclick="confirmEditService({{ $service->id }})" title="{{ __('Confirmar') }}">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" class="btn btn-secondary hidden" id="cancel-edit-button-{{ $service->id }}" onclick="cancelEditService({{ $service->id }})" title="{{ __('Cancelar') }}">
+                                            <i class="fas fa-times"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -53,7 +60,6 @@
             <div class="fixed inset-0 transition-opacity" aria-hidden="true" onclick="closeModal()">
                 <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full sm:p-6">
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
@@ -68,7 +74,11 @@
                     <label for="service-name" class="block text-sm font-medium text-gray-700">{{ __('Nome do Serviço') }}</label>
                     <input type="text" id="service-name" name="name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                 </div>
-                <div class="mt-4 flex justify-end space-x-2">
+                <div class="mt-2">
+                    <label for="service-code" class="block text-sm font-medium text-gray-700">{{ __('Código do Serviço') }}</label>
+                    <input type="text" id="service-code" name="service_code" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+                <div class="mt-4 flex justify-center space-x-2">
                     <button onclick="addService()" class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm">
                         {{ __('Incluir') }}
                     </button>
@@ -86,37 +96,86 @@
         }
 
         function editService(id) {
-            const nameField = document.getElementById('service-name-' + id);
-            if (!nameField) {
-                console.error(`Elemento com ID service-name-${id} não encontrado.`);
-                return;
-            }
+            const row = document.getElementById('service-row-' + id);
+            const nameField = row.querySelector('#service-name-' + id + ' .service-text');
+            const codeField = row.querySelector('#service-code-' + id + ' .service-text');
+            const nameInput = row.querySelector('#service-name-' + id + ' .service-input');
+            const codeInput = row.querySelector('#service-code-' + id + ' .service-input');
+            const editButton = row.querySelector('#edit-button-' + id);
+            const deleteButton = row.querySelector('#delete-button-' + id);
+            const confirmEditButton = row.querySelector('#confirm-edit-button-' + id);
+            const cancelEditButton = row.querySelector('#cancel-edit-button-' + id);
 
-            const currentName = nameField.textContent.trim();
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = currentName;
-            input.classList.add('border', 'px-4', 'py-2', 'w-full');
+            nameField.classList.add('hidden');
+            codeField.classList.add('hidden');
+            nameInput.classList.remove('hidden');
+            codeInput.classList.remove('hidden');
 
-            input.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
-                    updateService(id, input.value);
-                }
-            });
+            nameInput.focus();
 
-            nameField.innerHTML = '';
-            nameField.appendChild(input);
-            input.focus();
+            editButton.classList.add('hidden');
+            deleteButton.classList.add('hidden');
+            confirmEditButton.classList.remove('hidden');
+            cancelEditButton.classList.remove('hidden');
         }
 
-        function updateService(id, newName) {
+        function confirmEditService(id) {
+            const row = document.getElementById('service-row-' + id);
+            const nameField = row.querySelector('#service-name-' + id + ' .service-text');
+            const codeField = row.querySelector('#service-code-' + id + ' .service-text');
+            const nameInput = row.querySelector('#service-name-' + id + ' .service-input');
+            const codeInput = row.querySelector('#service-code-' + id + ' .service-input');
+            const editButton = row.querySelector('#edit-button-' + id);
+            const deleteButton = row.querySelector('#delete-button-' + id);
+            const confirmEditButton = row.querySelector('#confirm-edit-button-' + id);
+            const cancelEditButton = row.querySelector('#cancel-edit-button-' + id);
+
+            updateService(id, nameInput.value, codeInput.value);
+
+            nameField.textContent = nameInput.value;
+            codeField.textContent = codeInput.value;
+
+            nameField.classList.remove('hidden');
+            codeField.classList.remove('hidden');
+            nameInput.classList.add('hidden');
+            codeInput.classList.add('hidden');
+
+            editButton.classList.remove('hidden');
+            deleteButton.classList.remove('hidden');
+            confirmEditButton.classList.add('hidden');
+            cancelEditButton.classList.add('hidden');
+        }
+
+        function cancelEditService(id) {
+            const row = document.getElementById('service-row-' + id);
+            const nameField = row.querySelector('#service-name-' + id + ' .service-text');
+            const codeField = row.querySelector('#service-code-' + id + ' .service-text');
+            const nameInput = row.querySelector('#service-name-' + id + ' .service-input');
+            const codeInput = row.querySelector('#service-code-' + id + ' .service-input');
+            const editButton = row.querySelector('#edit-button-' + id);
+            const deleteButton = row.querySelector('#delete-button-' + id);
+            const confirmEditButton = row.querySelector('#confirm-edit-button-' + id);
+            const cancelEditButton = row.querySelector('#cancel-edit-button-' + id);
+
+            nameField.classList.remove('hidden');
+            codeField.classList.remove('hidden');
+            nameInput.classList.add('hidden');
+            codeInput.classList.add('hidden');
+
+            editButton.classList.remove('hidden');
+            deleteButton.classList.remove('hidden');
+            confirmEditButton.classList.add('hidden');
+            cancelEditButton.classList.add('hidden');
+        }
+
+        function updateService(id, newName, newCode) {
             fetch(`/services/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ name: newName })
+                body: JSON.stringify({ name: newName, service_code: newCode })
             })
             .then(response => {
                 if (!response.ok) {
@@ -125,13 +184,38 @@
                 return response.json();
             })
             .then(data => {
-                const nameField = document.getElementById('service-name-' + id);
-                if (nameField) {
+                const nameField = document.getElementById('service-name-' + id).querySelector('.service-text');
+                const codeField = document.getElementById('service-code-' + id).querySelector('.service-text');
+                if (nameField && codeField) {
                     nameField.textContent = data.name;
+                    codeField.textContent = data.service_code;
                 }
             })
             .catch(error => {
                 alert('Erro ao atualizar o serviço: ' + error.message);
+            });
+        }
+
+        function deleteService(id) {
+            if (!confirmDelete()) {
+                return;
+            }
+
+            fetch(`/services/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao excluir o serviço');
+                }
+                document.getElementById('service-row-' + id).remove();
+            })
+            .catch(error => {
+                alert('Erro ao excluir o serviço: ' + error.message);
             });
         }
 
@@ -145,8 +229,9 @@
 
         function addService() {
             const name = document.getElementById('service-name').value;
-            if (!name) {
-                alert('Por favor, insira um nome para o serviço.');
+            const code = document.getElementById('service-code').value;
+            if (!name || !code) {
+                alert('Por favor, insira o nome e o código do serviço.');
                 return;
             }
 
@@ -156,7 +241,7 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ name: name })
+                body: JSON.stringify({ name: name, service_code: code })
             })
             .then(response => {
                 if (!response.ok) {
@@ -167,29 +252,49 @@
             .then(data => {
                 const newRow = `
                     <tr id="service-row-${data.id}">
-
-                        <td class="border px-4 py-2" id="service-name-${data.id}">${data.name}</td>
+                        <td class="border px-4 py-2" id="service-name-${data.id}">
+                            <span class="service-text">${data.name}</span>
+                            <input type="text" class="service-input hidden" value="${data.name}">
+                        </td>
+                        <td class="border px-4 py-2" id="service-code-${data.id}">
+                            <span class="service-text">${data.service_code}</span>
+                            <input type="text" class="service-input hidden" value="${data.service_code}">
+                        </td>
                         <td class="border px-4 py-2 flex space-x-2">
-                            <a href="javascript:void(0);" class="btn btn-warning" onclick="editService(${data.id})" title="{{ __('Editar') }}">
+                            <a href="javascript:void(0);" class="btn btn-warning" id="edit-button-${data.id}" onclick="editService(${data.id})" title="{{ __('Editar') }}">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="/services/${data.id}" method="POST" style="display:inline-block;" onsubmit="return confirmDelete();" title="{{ __('Excluir') }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                            <a href="javascript:void(0);" class="btn btn-danger" id="delete-button-${data.id}" onclick="deleteService(${data.id})" title="{{ __('Excluir') }}">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            <a href="javascript:void(0);" class="btn btn-success hidden" id="confirm-edit-button-${data.id}" onclick="confirmEditService(${data.id})" title="{{ __('Confirmar') }}">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            <a href="javascript:void(0);" class="btn btn-secondary hidden" id="cancel-edit-button-${data.id}" onclick="cancelEditService(${data.id})" title="{{ __('Cancelar') }}">
+                                <i class="fas fa-times"></i>
+                            </a>
                         </td>
                     </tr>
                 `;
                 document.getElementById('services-table-body').insertAdjacentHTML('beforeend', newRow);
                 closeModal();
                 document.getElementById('service-name').value = '';
+                document.getElementById('service-code').value = '';
             })
             .catch(error => {
                 alert('Erro ao adicionar o serviço: ' + error.message);
             });
         }
     </script>
+
+    <style>
+        .service-input {
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+        .align-middle {
+            vertical-align: middle;
+        }
+    </style>
 </x-app-layout>

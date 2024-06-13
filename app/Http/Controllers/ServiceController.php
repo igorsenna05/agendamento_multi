@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Service;
 
 use Illuminate\Http\Request;
+use Log;
 
 class ServiceController extends Controller
 {
@@ -32,9 +33,12 @@ class ServiceController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'service_code' => 'required|string|max:255',
         ]);
 
-        $service = Service::create($request->only('name'));
+        $service = Service::create([
+                            'name' => $request->name,
+                            'service_code' => $request->service_code]);
 
         return response()->json($service);
     }
@@ -63,6 +67,7 @@ class ServiceController extends Controller
         try {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:255',
+                'service_code' => 'required|string|max:255',
             ]);
     
             $service = Service::findOrFail($id);
@@ -70,7 +75,7 @@ class ServiceController extends Controller
     
             return response()->json($service);    
         } catch (\Exception $e) {
-            \Log::error('Erro ao atualizar serviço: '.$e->getMessage());
+            Log::error('Erro ao atualizar serviço: '.$e->getMessage());
             return response()->json(['error' => 'Erro ao atualizar serviço'], 500);
         }
     }
