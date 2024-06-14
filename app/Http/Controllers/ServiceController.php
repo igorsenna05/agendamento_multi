@@ -88,6 +88,6 @@ class ServiceController extends Controller
         $service = Service::findOrFail($id);
         $service->delete();
 
-        return redirect()->route('services.index')->with('success', 'Serviço excluído com sucesso.');
+        return response()->json(['success' => 'Serviço excluído com sucesso.']);
     }
 }

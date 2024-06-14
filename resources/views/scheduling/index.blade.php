@@ -69,16 +69,17 @@
                     <div class="col-md-6">
                         <label for="user_insc" class="form-label">Nº de Inscrição:</label>
                         <div class="input-group">
+
+                            <input type="number" class="form-control" name="user_insc" id="user_insc" value="{{ old('user_insc') }}" required style="text-align: right;">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="insc_suffix">{{ old('formatted_insc') ? explode('-', old('formatted_insc'))[1] : '' }}</span>
+                            </div>
                             <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" required>Categoria</button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" data-category="AE">Auxiliar de Enfermagem</a>
                                 <a class="dropdown-item" data-category="TE">Técnico de Enfermagem</a>
                                 <a class="dropdown-item" data-category="ENF">Enfermeiro</a>
                                 <a class="dropdown-item" data-category="OB">Obstetriz</a>
-                            </div>
-                            <input type="number" class="form-control" name="user_insc" id="user_insc" value="{{ old('user_insc') }}" required style="text-align: right;">
-                            <div class="input-group-append">
-                                <span class="input-group-text" id="insc_suffix">{{ old('formatted_insc') ? explode('-', old('formatted_insc'))[1] : '' }}</span>
                             </div>
                         </div>
                     </div>
