@@ -89,8 +89,8 @@ Este projeto é um sistema de árvore de decisões interativa e módulo de agend
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/seu-repositorio.git
-   cd seu-repositorio
+   git clone https://github.com/igorsenna05/agendamento_multi.git
+   cd agendamento_multi
    ```
 
 2. Instale as dependências do Composer:
