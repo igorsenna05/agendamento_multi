@@ -116,7 +116,7 @@ Este projeto é um sistema de árvore de decisões interativa e módulo de agend
 6. Instale as dependências do NPM e compile os assets:
    ```bash
    npm install
-   npm run dev
+   npm run build
    ```
 
 ## Uso
