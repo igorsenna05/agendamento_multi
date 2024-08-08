@@ -7,6 +7,7 @@ use App\Http\Controllers\DecisionTreeController;
 use App\Http\Controllers\ScheduleSlotController;
 use App\Http\Controllers\SchedulingController;
 use App\Http\Controllers\InstructionController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 
 // Show Decision Tree at the root.
@@ -39,10 +40,11 @@ Route::middleware('auth')->group(function () {
     Route::post('schedule_slots/bulk_store', [ScheduleSlotController::class, 'bulkStore'])->name('schedule_slots.bulkStore');
     Route::get('schedule_slots/bulk_destroy', [ScheduleSlotController::class, 'bulkDestroyPrep'])->name('schedule_slots.bulkDestroyPrep');
     Route::delete('schedule_slots/bulk_destroy', [ScheduleSlotController::class, 'bulkDestroy'])->name('schedule_slots.bulkDestroy');
-    Route::resource('schedule_slots', ScheduleSlotController::class); 
+    Route::resource('schedule_slots', ScheduleSlotController::class);
     //instructions
-    Route::resource('instructions', InstructionController::class); 
-
+    Route::resource('instructions', InstructionController::class);
+    //profile
+    Route::resource('roles', RoleController::class);
 });
 
 
