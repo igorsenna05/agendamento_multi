@@ -30,6 +30,9 @@
                     <x-nav-link :href="route('schedule_slots.index')" :active="request()->routeIs('schedule_slots.index')">
                         {{ __('Controle do Agendamento') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.index')">
+                        {{ __('Perfis') }}
+                    </x-nav-link>
                 </div>
             </div>
 
