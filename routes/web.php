@@ -8,6 +8,7 @@ use App\Http\Controllers\ScheduleSlotController;
 use App\Http\Controllers\SchedulingController;
 use App\Http\Controllers\InstructionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Show Decision Tree at the root.
@@ -43,8 +44,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('schedule_slots', ScheduleSlotController::class);
     //instructions
     Route::resource('instructions', InstructionController::class);
-    //profile
+    //roles
     Route::resource('roles', RoleController::class);
+    //users
+    Route::resource('users', UserController::class);
 });
 
 
