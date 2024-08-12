@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Http\Requests\ProfileUpdateRequest;
 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Log;
 
@@ -23,7 +26,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('users.create');
     }
 
     /**
@@ -33,15 +36,15 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email',
+            'email' =>  ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)],
         ]);
-
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'password' => Hash::make($request->password),
         ]);
 
-        return response()->json($user);
+        return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso!');
     }
 
     /**
@@ -55,30 +58,23 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $user)
     {
-        //
+        return view('users.edit', compact('user'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProfileUpdateRequest $request, User $user)
     {
-        try {
-            $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email',
-            ]);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' =>  ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+        ]);
 
-            $user = User::findOrFail($id);
-            $user->update($validatedData);
-
-            return response()->json($user);
-        } catch (\Exception $e) {
-            Log::error('Erro ao atualizar usuário: '.$e->getMessage());
-            return response()->json(['error' => 'Erro ao atualizar usuário'], 500);
-        }
+        $user->update($request->all());
+        return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso!');
     }
 
     /**
