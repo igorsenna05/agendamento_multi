@@ -26,7 +26,13 @@
                                     <td>{{ $user->id }}</td>
                                     <td>{{ $user->name }}</td>
                                     <td>{{ $user->email }}</td>
-                                    <td>{{ $user->email }}</td>
+                                    <td>
+                                        @if($user->role)
+                                            {{  $user->role->name }}
+                                        @else
+                                            não há
+                                        @endif
+                                    </td>
                                     <td>
                                         <a href="{{ route('users.edit', $user->id) }}" class="btn btn-warning btn-sm">{{ __('Editar') }}</a>
                                         <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline-block;">

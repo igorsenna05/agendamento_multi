@@ -54,6 +54,18 @@
                             @endif
                         </div>
 
+                        <div>
+                            <x-input-label for="role_id" :value="__('Perfil')" />
+                            <select id="role_id" name="role_id" class="form-select" required>
+                                <option value="">{{ __('Selecione um perfil') }}</option>
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->id }}"
+                                    {{ isset($user->role) && $user->role->id == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                            <x-input-error class="mt-2" :messages="$errors->get('role')" />
+                        </div>
+
                         <div class="flex items-center gap-4">
                         <x-primary-button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 {{ __('Salvar') }}
